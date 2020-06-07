@@ -22,10 +22,43 @@ export const MOVIE_QUERY = gql`
 `
 
 export const USER_QUERY = gql`
-    query user($userId:Int!){
-        user(userId:$userId){
-            id, name, birthdate, gender
+    query user($email:String!){
+        user(email:$email){
+            email, name, birthdate, gender
         }
     }
 `
 
+
+export const SIGNUP_MUTATION = gql`
+  mutation SignupMutation($email: String!, $password: String!, $name: String!) {
+    signup(email: $email, password: $password, name: $name) {
+      token
+    }
+  }
+`
+// export const SIGNUP_MUTATION = gql`
+//   mutation SignupMutation($email: String!, $password: String!, $name: String!) {
+//     signup(email: $email, password: $password, name: $name) {
+//       token
+//     }
+//   }
+// `
+
+export const LOGIN_MUTATION = gql`
+  mutation LoginMutation($email: String!, $password: String!) {
+    tokenAuth(email: $email, password: $password) {
+      token
+    }
+  }
+`
+export const ME_QUERY = gql`
+  query MeQuery {
+    me {
+      email,
+      name,
+      birthdate,
+      gender
+    }
+  }
+`

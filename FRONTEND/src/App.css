@@ -14,7 +14,8 @@ html, body {
     min-width: 100%;
     min-height: 100vh;
     flex-direction: column;
-    background-color: #181818;
+    /*background-color: #181818;*/
+    background-color: #EEEEEE;
     /*font-family: "Open Sans", sans-serif;*/
     font-size: 16px;
     font-family: sans-serif;
@@ -41,6 +42,10 @@ html, body {
     color:black;
     font-weight: bold;
     cursor:pointer;
+}
+.user-profile-button:hover {
+    /*box-shadow: 0 12px 18px 4px rgba(0,0,0, 0.8);*/
+    background: #e1e1e1;
 }
 /* MOVIE CARD */
 .movie-card {
@@ -133,7 +138,7 @@ html, body {
     position: relative;
     display: flex;
     height:352px;
-    background-color: #f1f1f1;
+    background-color: #ffffff;
 }
 .user-page-info {
     position: relative;
@@ -143,4 +148,34 @@ html, body {
     width: auto;
     max-width: 400px;
     padding: 16px 32px;
+}
+/* other */
+.default-button {
+    padding: 8px 16px;
+    margin:10px 10px;
+    background: #CCCCCC;
+    color:black;
+    font-weight: bold;
+    cursor:pointer;
+    width: auto;
+    border-style: solid;
+    border-color: #CCCCCC;
+}
+.default-button:hover {
+    background: #DDDDDD;
+    border-style: solid;
+    border-color: #010101;
+    /*box-shadow: 0 12px 18px 4px rgba(0,0,0, 0.8);*/
+}
+/* other */
+.centered-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    /*min-height: 30vh;*/
+    margin:10vh 10vw;
+    border-radius: 6px;
 }
