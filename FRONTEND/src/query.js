@@ -58,7 +58,12 @@ export const ME_QUERY = gql`
       email,
       name,
       birthdate,
-      gender
+      gender,
+      items {
+        name,
+        year,
+        slug
+      }
     }
   }
 `

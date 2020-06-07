@@ -137,17 +137,35 @@ html, body {
 .user-page-box {
     position: relative;
     display: flex;
-    height:352px;
+    height:auto;
     background-color: #ffffff;
 }
 .user-page-info {
     position: relative;
     display: flex;
     flex-direction: column;
-    height:352px;
+    height:auto;
     width: auto;
     max-width: 400px;
     padding: 16px 32px;
+}
+.user-page-movie-entry {
+    padding: 8px 16px;
+    margin:5px 5px;
+    /*background: #CCCCCC;*/
+    color:black;
+    font-weight: bold;
+    cursor:pointer;
+    width: auto;
+    /*border-style: solid;*/
+    border-color: #CCCCCC;
+}
+.user-page-movie-entry:hover {
+    box-shadow: 0 12px 18px 4px rgba(0,0,0, 0.8);
+}
+.user-page-movie-entry-link {
+    color:black;
+    font-weight: bold;
 }
 /* other */
 .default-button {
