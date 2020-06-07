@@ -6,39 +6,6 @@ from users.models import User
 import graphql_jwt
 
 
-class MovieType(DjangoObjectType):
-    id = graphene.Int()
-    name = graphene.String()
-    year = graphene.Int()
-    summary = graphene.String()
-    poster_url = graphene.String()
-    slug = graphene.String()
-
-    class Meta:
-        model = Movie
-
-    def resolve_id(self, info):
-        return self.id
-    
-    def resolve_name(self, info):
-        return self.name
-
-    def resolve_year(self, info):
-        return self.year
-
-    def resolve_summary(self, info):
-        return self.summary
-
-    def resolve_poster_url(self, info):
-        # Note: in client side app snake_case fields
-        # will be resolved as camelCase
-        # Eg: poster_url ==> posterUrl
-        return self.poster_url
-
-    def resolve_slug(self, info):
-        return self.slug
-
-
 # class UserType(DjangoObjectType):
 #     id = graphene.Int()
 #     email = graphene.String()
@@ -69,6 +36,43 @@ class UserType(DjangoObjectType):
         model = User
 
 
+class MovieType(DjangoObjectType):
+    id = graphene.Int()
+    name = graphene.String()
+    year = graphene.Int()
+    summary = graphene.String()
+    poster_url = graphene.String()
+    slug = graphene.String()
+    user = graphene.Field(UserType)
+
+    class Meta:
+        model = Movie
+
+    def resolve_id(self, info):
+        return self.id
+    
+    def resolve_name(self, info):
+        return self.name
+
+    def resolve_year(self, info):
+        return self.year
+
+    def resolve_summary(self, info):
+        return self.summary
+
+    def resolve_poster_url(self, info):
+        # Note: in client side app snake_case fields
+        # will be resolved as camelCase
+        # Eg: poster_url ==> posterUrl
+        return self.poster_url
+
+    def resolve_slug(self, info):
+        return self.slug
+
+    def resolve_user(self, info):
+        return self.user
+
+
 class Query(graphene.ObjectType):
     movie_list = graphene.List(MovieType)
     movie = graphene.Field(MovieType, slug=graphene.String())
@@ -81,7 +85,7 @@ class Query(graphene.ObjectType):
     # userid_by_email = graphene.Field(UserType, email=graphene.String())
 
     def resolve_movie_list(self, info, *_):
-        return Movie.objects.all().only("name", "poster_url", "slug")
+        return Movie.objects.all().only("name", "poster_url", "slug", "user")
 
     def resolve_movie(self, info, slug):
         movie_queryset = Movie.objects.all().filter(slug=slug)

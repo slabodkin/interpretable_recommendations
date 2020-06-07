@@ -64,3 +64,7 @@ class User(AbstractUser):
             new_user = cls.objects.create(**record)
             new_user.is_active = True
             print("Import operation done successfully")
+
+    @classmethod 
+    def clear_records(cls): # by adding cls we just enforce that it's a static method, proper to class
+        cls.objects.all().delete()
