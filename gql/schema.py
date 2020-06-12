@@ -75,25 +75,26 @@ class MovieType(DjangoObjectType):
 class RateType(DjangoObjectType):
     user = graphene.Field(UserType)
     item = graphene.Field(MovieType)
-    rate = graphene.Int()
+    score = graphene.Int()
 
     class Meta:
         model = Rate
 
     def resolve_user(self, info):
-        return user
+        return self.user
     
     def resolve_item(self, info):
-        return item
+        return self.item
     
-    def resolve_rate(self, info):
-        return rate
+    def resolve_score(self, info):
+        return self.score
 
 
 class Query(graphene.ObjectType):
     movie_list = graphene.List(MovieType)
     movie = graphene.Field(MovieType, slug=graphene.String())
     user = graphene.Field(UserType, email=graphene.String())
+    rate = graphene.Field(RateType, user_email=graphene.String(), item_slug=graphene.String())
     user_list = graphene.List(UserType)
     me = graphene.Field(UserType)
 
@@ -109,6 +110,17 @@ class Query(graphene.ObjectType):
         if movie_queryset.exists():
             return movie_queryset.first()
 
+    def resolve_rate(self, info, user_email, item_slug):
+        movie_queryset = Movie.objects.all().filter(slug=item_slug)
+        if movie_queryset.exists():
+            rate_movie = movie_queryset.first()
+        user_queryset = User.objects.all().filter(email=user_email)
+        if user_queryset.exists():
+            rate_user = user_queryset.first()
+        if rate_movie is not None and user_email is not None:
+            rate_queryset = Rate.objects.all().filter(user=rate_user, item=rate_item)
+            if rate_queryset.exists():
+                return rate_queryset.first()
     #users
     # def resolve_user(self, info, email):
     #     print("user_query: " + email)

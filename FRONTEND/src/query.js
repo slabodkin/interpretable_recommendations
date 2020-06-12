@@ -61,11 +61,11 @@ export const ME_QUERY = gql`
       gender,
       rates {
         item {
-          name
+          name,
           year,
           slug
-        }
-        rate
+        },
+        score
       }
     }
   }

@@ -45,10 +45,10 @@ class Rate(models.Model):
         User, related_name='rates', on_delete=models.CASCADE)
     item = models.ForeignKey(
         Movie, related_name='rates', on_delete=models.CASCADE)
-    rate = models.IntegerField(primary_key=False)
+    score = models.IntegerField(primary_key=False)
 
     def __str__(self):
-        return f"{self.user},{self.item},{self.rate}"
+        return f"{self.user},{self.item},{self.score}"
 
     @classmethod
     def import_records(cls, input_csv_filename):
@@ -70,8 +70,8 @@ class Rate(models.Model):
             else:
                 print(f"no movie with id {item_slug}, skipping current entry")
                 continue
-            rate = row.rate
-            new_rate = cls.objects.create(**{"user": user_entry, "item": movie_entry, "rate": rate})
+            score = row.rate
+            new_rate = cls.objects.create(**{"user": user_entry, "item": movie_entry, "score": score})
             new_rate.save()
             print("Import operation done successfully")
 

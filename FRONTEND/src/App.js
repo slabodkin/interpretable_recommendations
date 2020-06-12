@@ -134,20 +134,20 @@ const UserPage = (props) => {
         <div className="user-page-box">
           <div className="user-page-info">
             <h1>Name: {user.name}</h1>
-            <p>Birth date: {user.birthdate}</p>
-            <p>Age: {user.age}</p>
-            <p>Gender: {user.gender}</p>
-            <p>Items: 
-              {user.items &&
-                user.items.map(movie => (
-                  <p  className="user-page-movie-entry">
-                    <Link to={`/movie/${movie.slug}`} className="user-page-movie-entry-link">
-                      {movie.name}, {movie.year}
+            <div>Birth date: {user.birthdate}</div>
+            <div>Age: {user.age}</div>
+            <div>Gender: {user.gender}</div>
+            <div>Items: 
+              {user.rates &&
+                user.rates.map(rate => (
+                  <p  className="user-page-movie-entry" key={rate.item.slug}>
+                    <Link to={`/movie/${rate.item.slug}`} className="user-page-movie-entry-link">
+                      {rate.item.name}, {rate.item.year}, rate: {rate.score}
                     </Link>
                   </p>
                 ))
               }
-            </p>
+            </div>
           </div>
         </div>
       }
