@@ -115,21 +115,18 @@ const MoviePage = (props) => {
 
 
 const UserPage = (props) => {
-  console.log("UserPage start");
-
   // uncomment to see which props are passed from router
   // console.log(props)
   
   const { loading, error, data } = useQuery(ME_QUERY, {});
   
   let user = (!loading && !error) ? data.me : null;
-  console.log(user ? user.email : user);
+  // console.log(user ? user.email : user);
   if (loading) return <div>Loading</div>
   if (error) return <div>Unexpected Error: {error.message}</div>
   
   // console.log(data2, error2, loading2);
 
-  console.log("UserPage End");
   return (
     <div className="user-page">
     <Link to="/" className="back-button" >Main Page</Link>

@@ -1,10 +1,10 @@
 import graphene
-from items.models import Movie
+from items.models import Movie, Rate
 from graphene_django.types import DjangoObjectType
 from users.models import User
 # from django.contrib.auth import get_user_model
 import graphql_jwt
-
+from graphql_jwt.shortcuts import get_token
 
 # class UserType(DjangoObjectType):
 #     id = graphene.Int()
@@ -43,7 +43,7 @@ class MovieType(DjangoObjectType):
     summary = graphene.String()
     poster_url = graphene.String()
     slug = graphene.String()
-    user = graphene.Field(UserType)
+    # user = graphene.Field(UserType)
 
     class Meta:
         model = Movie
@@ -69,8 +69,25 @@ class MovieType(DjangoObjectType):
     def resolve_slug(self, info):
         return self.slug
 
+    # def resolve_user(self, info):
+    #     return self.user
+
+class RateType(DjangoObjectType):
+    user = graphene.Field(UserType)
+    item = graphene.Field(MovieType)
+    rate = graphene.Int()
+
+    class Meta:
+        model = Rate
+
     def resolve_user(self, info):
-        return self.user
+        return user
+    
+    def resolve_item(self, info):
+        return item
+    
+    def resolve_rate(self, info):
+        return rate
 
 
 class Query(graphene.ObjectType):
@@ -85,7 +102,7 @@ class Query(graphene.ObjectType):
     # userid_by_email = graphene.Field(UserType, email=graphene.String())
 
     def resolve_movie_list(self, info, *_):
-        return Movie.objects.all().only("name", "poster_url", "slug", "user")
+        return Movie.objects.all().only("name", "poster_url", "slug")
 
     def resolve_movie(self, info, slug):
         movie_queryset = Movie.objects.all().filter(slug=slug)
@@ -93,16 +110,14 @@ class Query(graphene.ObjectType):
             return movie_queryset.first()
 
     #users
-    def resolve_user(self, info, email):
-        print("user_query: " + email)
-        user_queryset = User.objects.all().filter(email=email)
-        if user_queryset.exists():
-            return user_queryset.first()
+    # def resolve_user(self, info, email):
+    #     print("user_query: " + email)
+    #     user_queryset = User.objects.all().filter(email=email)
+    #     if user_queryset.exists():
+    #         return user_queryset.first()
+
 
     def resolve_me(self, info):
-        print("\n\nhi\n\n")
-        print(info.context.user)
-        print("\ndone\n")
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Not logged in!')
@@ -110,7 +125,8 @@ class Query(graphene.ObjectType):
 
 
 class SignupMutation(graphene.Mutation):
-    user = graphene.Field(UserType)
+    # user = graphene.Field(UserType)
+    token = graphene.String()
 
     class Arguments:
         email = graphene.String(required=True)
@@ -127,7 +143,9 @@ class SignupMutation(graphene.Mutation):
         user.is_active = True
         user.save()
 
-        return SignupMutation(user=user)
+        token = get_token(user)
+        # refresh_token = create_refresh_token(user)
+        return SignupMutation(token=token)
 
 
 class Mutation(graphene.ObjectType):

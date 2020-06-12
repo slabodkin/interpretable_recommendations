@@ -60,7 +60,7 @@ class User(AbstractUser):
             if users_queryset.exists():
                 user = users_queryset.first()
                 user.delete()
-                print(f"Id:{record.get('id')} already exists, deleting") 
+                print(f"email:{record.get('email')} already exists, deleting") 
             new_user = cls.objects.create(**record)
             new_user.is_active = True
             print("Import operation done successfully")
