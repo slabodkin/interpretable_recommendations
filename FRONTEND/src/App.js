@@ -26,7 +26,7 @@ export default App
 import { useQuery } from '@apollo/react-hooks';
 
 // import our queries previously defined
-import { MOVIE_QUERY, MOVIE_LIST_QUERY, USER_QUERY, ME_QUERY } from "./query"
+import { MOVIE_QUERY, MOVIE_LIST_QUERY, USER_QUERY, ME_QUERY, RECOMMENDATIONS_QUERY } from "./query"
 
 
 const MainPage = (props) => {
@@ -119,14 +119,16 @@ const UserPage = (props) => {
   // console.log(props)
   
   const { loading, error, data } = useQuery(ME_QUERY, {});
+  const { loading: loading2, error: error2, data: data2 } = useQuery(RECOMMENDATIONS_QUERY, {});
   
-  let user = (!loading && !error) ? data.me : null;
+  let user = (!loading && !error && data) ? data.me : null;
+  let recommendations = (!loading2 && !error2 && data2) ? data2.recommendations : null;
   // console.log(user ? user.email : user);
   if (loading) return <div>Loading</div>
   if (error) return <div>Unexpected Error: {error.message}</div>
+  if (loading2) return <div>Loading</div>
+  if (error2) return <div>Unexpected Error: {error2.message}</div>
   
-  // console.log(data2, error2, loading2);
-
   return (
     <div className="user-page">
     <Link to="/" className="back-button" >Main Page</Link>
@@ -143,6 +145,17 @@ const UserPage = (props) => {
                   <p  className="user-page-movie-entry" key={rate.item.slug}>
                     <Link to={`/movie/${rate.item.slug}`} className="user-page-movie-entry-link">
                       {rate.item.name}, {rate.item.year}, rate: {rate.score}
+                    </Link>
+                  </p>
+                ))
+              }
+            </div>
+            <div>You might also like: 
+              {recommendations &&
+                recommendations.map(item => (
+                  <p  className="user-page-movie-entry" key={item.slug}>
+                    <Link to={`/movie/${item.slug}`} className="user-page-movie-entry-link">
+                      {item.name}, {item.year}
                     </Link>
                   </p>
                 ))

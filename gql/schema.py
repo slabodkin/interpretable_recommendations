@@ -5,7 +5,7 @@ from users.models import User
 # from django.contrib.auth import get_user_model
 import graphql_jwt
 from graphql_jwt.shortcuts import get_token
-
+from recommendations.recommender import recommend_for_user
 # class UserType(DjangoObjectType):
 #     id = graphene.Int()
 #     email = graphene.String()
@@ -97,6 +97,7 @@ class Query(graphene.ObjectType):
     rate = graphene.Field(RateType, user_email=graphene.String(), item_slug=graphene.String())
     user_list = graphene.List(UserType)
     me = graphene.Field(UserType)
+    recommendations = graphene.List(MovieType)
 
     def resolve_user_list(self, info):
         return User.objects.all()
@@ -134,6 +135,17 @@ class Query(graphene.ObjectType):
         if user.is_anonymous:
             raise Exception('Not logged in!')
         return user
+
+    def resolve_recommendations(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Not logged in!')
+        item_slugs = recommend_for_user(user.email)
+        print(item_slugs)
+        items = Movie.objects.all().filter(slug__in=item_slugs)
+        return items
+
+
 
 
 class SignupMutation(graphene.Mutation):

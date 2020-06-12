@@ -70,3 +70,12 @@ export const ME_QUERY = gql`
     }
   }
 `
+export const RECOMMENDATIONS_QUERY = gql`
+  query RecommendationQuery {
+    recommendations {
+        name,
+        year,
+        slug
+    }
+  }
+`
