@@ -1,5 +1,5 @@
 import graphene
-from items.models import Movie, Rate
+from items.models import Movie, Item, Rate
 from graphene_django.types import DjangoObjectType
 from users.models import User
 # from django.contrib.auth import get_user_model
@@ -69,12 +69,41 @@ class MovieType(DjangoObjectType):
     def resolve_slug(self, info):
         return self.slug
 
+class ItemType(DjangoObjectType):
+    id = graphene.Int()
+    title = graphene.String()
+    year = graphene.Int()
+    author = graphene.String()
+    summary = graphene.String()
+    slug = graphene.String()
+
+    class Meta:
+        model = Item
+
+    def resolve_id(self, info):
+        return self.id
+    
+    def resolve_title(self, info):
+        return self.title
+
+    def resolve_year(self, info):
+        return self.year
+
+    def resolve_author(self, info):
+        return self.author
+
+    def resolve_summary(self, info):
+        return self.summary
+
+    def resolve_slug(self, info):
+        return self.slug
+
     # def resolve_user(self, info):
     #     return self.user
 
 class RateType(DjangoObjectType):
     user = graphene.Field(UserType)
-    item = graphene.Field(MovieType)
+    item = graphene.Field(ItemType)
     score = graphene.Int()
 
     class Meta:
@@ -91,34 +120,55 @@ class RateType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    movie_list = graphene.List(MovieType)
-    movie = graphene.Field(MovieType, slug=graphene.String())
+    # movie_list = graphene.List(MovieType)
+    # movie = graphene.Field(MovieType, slug=graphene.String())
+    item_list = graphene.List(ItemType, n=graphene.Int())
+    item = graphene.Field(ItemType, item_id=graphene.Int())
     user = graphene.Field(UserType, email=graphene.String())
     rate = graphene.Field(RateType, user_email=graphene.String(), item_slug=graphene.String())
     user_list = graphene.List(UserType)
     me = graphene.Field(UserType)
-    recommendations = graphene.List(MovieType)
+    # recommendations = graphene.List(MovieType)
+    recommendations = graphene.List(ItemType)
 
     def resolve_user_list(self, info):
         return User.objects.all()
-    # userid_by_email = graphene.Field(UserType, email=graphene.String())
 
-    def resolve_movie_list(self, info, *_):
-        return Movie.objects.all().only("name", "poster_url", "slug")
+    # def resolve_movie_list(self, info, *_):
+    #     return Movie.objects.all().only("name", "poster_url", "slug")
 
-    def resolve_movie(self, info, slug):
-        movie_queryset = Movie.objects.all().filter(slug=slug)
-        if movie_queryset.exists():
-            return movie_queryset.first()
+    # def resolve_movie(self, info, slug):
+    #     movie_queryset = Movie.objects.all().filter(slug=slug)
+    #     if movie_queryset.exists():
+    #         return movie_queryset.first()
 
-    def resolve_rate(self, info, user_email, item_slug):
-        movie_queryset = Movie.objects.all().filter(slug=item_slug)
-        if movie_queryset.exists():
-            rate_movie = movie_queryset.first()
-        user_queryset = User.objects.all().filter(email=user_email)
+    def resolve_item_list(self, info, n):
+        return Item.objects.all().order_by('?')[:n]#.only("name", "poster_url", "slug")
+
+    def resolve_item(self, info, item_id):
+        item_queryset = Item.objects.all().filter(pk=item_id)
+        if item_queryset.exists():
+            return item_queryset.first()
+
+    # def resolve_rate(self, info, user_email, item_slug):
+    #     movie_queryset = Movie.objects.all().filter(slug=item_slug)
+    #     if movie_queryset.exists():
+    #         rate_movie = movie_queryset.first()
+    #     user_queryset = User.objects.all().filter(email=user_email)
+    #     if user_queryset.exists():
+    #         rate_user = user_queryset.first()
+    #     if rate_movie is not None and user_email is not None:
+    #         rate_queryset = Rate.objects.all().filter(user=rate_user, item=rate_item)
+    #         if rate_queryset.exists():
+    #             return rate_queryset.first()
+    def resolve_rate(self, info, user_id, item_id):
+        item_queryset = Item.objects.all().filter(pk=item_id)
+        if item_queryset.exists():
+            rate_item = item_queryset.first()
+        user_queryset = User.objects.all().filter(pk=user_id)
         if user_queryset.exists():
             rate_user = user_queryset.first()
-        if rate_movie is not None and user_email is not None:
+        if rate_item is not None and rate_user is not None:
             rate_queryset = Rate.objects.all().filter(user=rate_user, item=rate_item)
             if rate_queryset.exists():
                 return rate_queryset.first()
@@ -140,9 +190,9 @@ class Query(graphene.ObjectType):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Not logged in!')
-        item_slugs = recommend_for_user(user.email)
-        print(item_slugs)
-        items = Movie.objects.all().filter(slug__in=item_slugs)
+        item_ids = recommend_for_user(user.id)
+        # print(item_ids)
+        items = Item.objects.all().filter(pk__in=item_ids)
         return items
 
 

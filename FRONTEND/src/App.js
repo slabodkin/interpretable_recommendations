@@ -14,6 +14,7 @@ const App = () => {
         // that makes slug parameter anything
         // like: /movie/the-matrix-1999   or /movie/anything
         <Route exact path="/movie/:slug" component={MoviePage} ></Route>
+        <Route exact path="/item/:slug" component={ItemPage} ></Route>
         <Route exact path="/profile" component={UserPage} ></Route>
         <Route exact path="/login" component={Login} />
       </Switch>
@@ -26,13 +27,16 @@ export default App
 import { useQuery } from '@apollo/react-hooks';
 
 // import our queries previously defined
-import { MOVIE_QUERY, MOVIE_LIST_QUERY, USER_QUERY, ME_QUERY, RECOMMENDATIONS_QUERY } from "./query"
+import { ITEM_QUERY, RANDOM_ITEM_LIST_QUERY, USER_QUERY, ME_QUERY, RECOMMENDATIONS_QUERY } from "./query"
 
 
 const MainPage = (props) => {
   const authToken = localStorage.getItem(AUTH_TOKEN)
   // console.log(authToken);
-  const { loading, error, data } = useQuery(MOVIE_LIST_QUERY);
+  let n_items = 10;
+  const { loading, error, data } = useQuery(RANDOM_ITEM_LIST_QUERY, { 
+    variables:{n:n_items}
+  });
   // let current_user_email = 1;
   // when query starts, loading will be true until the response will back.
   // At this time this will be rendered on screen
@@ -60,17 +64,12 @@ const MainPage = (props) => {
           Logout
         </div>
       }
-      {data && data.movieList &&
-        data.movieList.map(movie => (
-          <div className="movie-card" key={movie.slug}>
-            <img 
-              className="movie-card-image"
-              src={movie.posterUrl} 
-              alt={movie.name + " poster"} 
-              title={movie.name + " poster"} 
-            />
-            <p className="movie-card-name">{movie.name}</p>
-            <Link to={`/movie/${movie.slug}`} className="movie-card-link" />
+      {data && data.itemList &&
+        data.itemList.map(item => (
+          <div className="item-card" key={item.slug}>
+            <p className="item-card-title">{item.title}</p>
+            <p className="item-card-description">{item.author}, {item.year}</p>
+            <Link to={`/item/${item.slug}`} className="item-card-link" />
           </div>
         ))
       }
@@ -114,6 +113,37 @@ const MoviePage = (props) => {
 }
 
 
+const ItemPage = (props) => {
+  // uncomment to see which props are passed from router
+  //console.log(props)
+  // due to we make slug parameter dynamic in route component,
+  // urlParameters will look like this { slug: 'slug-of-the-selected-movie' }
+  const urlParameters = props.match.params
+  const { loading, error, data } = useQuery(ITEM_QUERY, { 
+    variables:{itemId:urlParameters.slug}
+  });
+  if (loading) return <div>Loading</div>
+  if (error) return <div>Unexpected Error: {error.message}</div>
+  
+  return (
+    <div className="movie-page">
+    <Link to="/" className="back-button" >Main Page</Link>
+      {data && data.item && 
+        <div className="movie-page-box">
+          <div className="movie-page-info">
+            <h1>{data.item.title}</h1>
+            <p>Year: {data.item.year}</p>
+            <p>Author: {data.item.author}</p>
+            <br />
+            <p>{data.item.summary}</p>
+          </div>
+        </div>
+      }
+    </div>
+  )
+}
+
+
 const UserPage = (props) => {
   // uncomment to see which props are passed from router
   // console.log(props)
@@ -123,7 +153,6 @@ const UserPage = (props) => {
   
   let user = (!loading && !error && data) ? data.me : null;
   let recommendations = (!loading2 && !error2 && data2) ? data2.recommendations : null;
-  // console.log(user ? user.email : user);
   if (loading) return <div>Loading</div>
   if (error) return <div>Unexpected Error: {error.message}</div>
   if (loading2) return <div>Loading</div>
@@ -143,8 +172,8 @@ const UserPage = (props) => {
               {user.rates &&
                 user.rates.map(rate => (
                   <p  className="user-page-movie-entry" key={rate.item.slug}>
-                    <Link to={`/movie/${rate.item.slug}`} className="user-page-movie-entry-link">
-                      {rate.item.name}, {rate.item.year}, rate: {rate.score}
+                    <Link to={`/item/${rate.item.slug}`} className="user-page-movie-entry-link">
+                      {rate.item.title}, {rate.item.author}, {rate.item.year}, rate: {rate.score}
                     </Link>
                   </p>
                 ))
@@ -154,8 +183,8 @@ const UserPage = (props) => {
               {recommendations &&
                 recommendations.map(item => (
                   <p  className="user-page-movie-entry" key={item.slug}>
-                    <Link to={`/movie/${item.slug}`} className="user-page-movie-entry-link">
-                      {item.name}, {item.year}
+                    <Link to={`/item/${item.slug}`} className="user-page-movie-entry-link">
+                      {item.title}, {item.author}, {item.year}
                     </Link>
                   </p>
                 ))
