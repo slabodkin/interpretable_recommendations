@@ -75,6 +75,7 @@ class User(AbstractUser):
                 print(f"email:{record.get('email')} already exists, deleting") 
             new_user = cls.objects.create(**record)
             new_user.is_active = True
+            new_user.save()
             print("Import operation done successfully")
 
     @classmethod
@@ -98,6 +99,7 @@ class User(AbstractUser):
                                           password=user_password,
                                           name=user_name)
             new_user.is_active = True
+            new_user.set_password(new_user.password)
             new_user.save()
 
             # print("Import operation done successfully")
@@ -106,3 +108,13 @@ class User(AbstractUser):
     @classmethod 
     def clear_records(cls): # by adding cls we just enforce that it's a static method, proper to class
         cls.objects.all().delete()
+
+
+
+
+
+
+ 
+
+
+

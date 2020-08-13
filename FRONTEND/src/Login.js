@@ -46,7 +46,7 @@ class Login extends Component {
           <input
             value={password}
             onChange={e => this.setState({ password: e.target.value })}
-            type="text" // TODO: change type back to "password" 
+            type="password" // TODO: change type back to "password" 
             placeholder={login? "Your password" : "Choose a safe password"}
           />
         </div>
@@ -85,6 +85,7 @@ class Login extends Component {
 
   _confirm(data) {
     const { token } = this.state.login ? data.tokenAuth : data.signup
+    // console.log(data.tokenAuth)
     this._saveUserData(token)
     this.props.history.push(`/`)
      // const { loading, error, data } = useQuery(USERID_BY_EMAIL_QUERY, { 
