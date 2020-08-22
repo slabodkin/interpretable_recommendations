@@ -55,3 +55,24 @@ def recommend_for_user(user_id, n_items_to_recommend=10, rates_df=None):
     #filter books already read by user 
     top_items = top_items[~np.isin(top_items, user_item_col_inds)][:n_items_to_recommend]
     return list(item_type.categories[top_items])
+
+
+
+def build_table(user_id_list, n_items_to_recommend=10, rates_df=None):
+    # запускаем рекомендацию для каждого юзера из списка юзеров
+    # пишем в таблицу, когда все записались
+    built_recommendations = {}
+    recommended_pairs = {}
+    for i in user_id_list: 
+        built_recommendations[i] = recommend_for_user(i)
+    for key in built_recommendations:
+        for i in built_recommendations[key]:
+            recommended_pairs[key] = i
+    df = pd.DataFrame(recommended_pairs, columns= ['user_id', 'item_id'])
+    df.to_csv (os.path.join(DATA_DIR, 'precalculated_recommendations.csv'), index = False, header=True)
+
+def fetch_values(user_id):
+    data = pd.read_csv(os.path.join(DATA_DIR, 'precalculated_recommendations.csv'))
+    rslt_df = dataframe[dataframe['user_id'] == user_id]
+    return list(rslt_df['item_id'])
+
